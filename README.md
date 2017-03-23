@@ -13,7 +13,7 @@ Install node, npm,socket.io.
 HOW TO RUN:
 
 Fork the current repository and type 
-
+git clone https://github.com/codeshef/chat.git
 Enter the folder : chat
 
 Run the command : node app.js
