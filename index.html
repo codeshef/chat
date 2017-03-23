@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <title>Chat-Room</title></head>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src='http://code.jquery.com/jquery-1.6.1.min.js'></script>
+    <script  src="main.js"></script>
+    <script>
+      var socket = io();
+      var  Max_upload = 1.5; // in MB
+        function setUsername(){
+            socket.emit('setUsername', document.getElementById('name').value);
+        };
+        var user;
+        socket.on('userExists', function(data){
+            document.getElementById('error-container').innerHTML = data;
+        });
+        socket.on('userSet', function(data){
+            user = data.username;
+            document.body.innerHTML = '<p><right><div id="lobby"></p><h3>Who is Online?</h3><p id="tally"></p><ul id="users"></ul></div></right><center><input type="text" id="message">\
+            <button type="button" name="button" onclick="sendMessage()">Send</button><div id="message-container"></center></div></p>\
+             <form action="/upload" enctype="multipart/form-data" method="post"><input type="file" name="upload" multiple="multiple"><br><input type="submit" value="Upload">\</form> ';
+              });
+             // list of online users
+          
+          socket.on('lobby',function(users_list,total_users)
+            {
+                  for(var i=0;i<users_list.length;i++)
+                  {
+                    document.getElementById('users').innerHTML += '<div><b>' + users_list[i] +  '</div>'
+                  }
+                
+                document.getElementById('tally').innerHTML += '<div><b>' + total_users+ '</b> ' + "users online"+ '</div>'
+                  
+            });
+                
+        function sendMessage(){
+            var msg = document.getElementById('message').value;
+            if(msg){
+                socket.emit('msg', {message: msg, user: user});
+            }
+            msg=' ';
+        }
+        socket.on('newmsg', function(data){
+            if(user){
+                document.getElementById('message-container').innerHTML += '<div><b>' + data.user + '</b>: ' + data.message + '</div>'
+            }
+        });
+        
+        
+    </script>
+    <body>
+        <center><h1>Chat-Room</h1></center>
+        <center><div id="error-container"></div>
+        <input id="name" type="text" name="name" value="" placeholder="Enter your name!">
+        <button type="button" name="button" onclick="setUsername()">Let me chat!</button></center>
+    </body>
+</html>
